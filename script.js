@@ -437,7 +437,7 @@ function loadProductsFromLocalStorage() {
 }
 
 // Función para mostrar mensajes al usuario (reemplazo de alert)
-function displayMessageModal(message, isConfirm = false, onConfirm = null) { // autoDismissDelay REMOVED
+function displayMessageModal(message, isConfirm = false, onConfirm = null, autoDismissDelay = 0) {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50';
     let buttonsHtml = `<button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 float-right" id="close-message-modal-btn">Cerrar</button>`;
@@ -473,6 +473,11 @@ function displayMessageModal(message, isConfirm = false, onConfirm = null) { // 
         document.getElementById('close-message-modal-btn').addEventListener('click', () => {
             modal.remove();
         });
+        if (autoDismissDelay > 0) {
+            setTimeout(() => {
+                modal.remove();
+            }, autoDismissDelay);
+        }
     }
 }
 
@@ -1266,7 +1271,7 @@ function saveEditedProduct() {
             category: category
         };
         saveProductsToLocalStorage(); // Guardar los datos actualizados
-        displayMessageModal(`Producto "${name}" actualizado exitosamente!`); // autoDismissDelay REMOVED
+        displayMessageModal(`Producto "${name}" actualizado exitosamente!`, false, null, 2000);
 
         // Re-renderizar los componentes que muestran datos de productos
         renderTopProductsTable(allProductsData, currentProductFilterCategory);
@@ -1352,7 +1357,7 @@ function handleCsvFileUpload(event) {
                 allProductsData.push(...productsWithIds); // Añadir los nuevos productos
                 saveProductsToLocalStorage(); // Guardar los datos actualizados
 
-                displayMessageModal(`Archivo CSV cargado y ${newProducts.length} productos añadidos exitosamente.`); // autoDismissDelay REMOVED
+                displayMessageModal(`Archivo CSV cargado y ${newProducts.length} productos añadidos exitosamente.`, false, null, 2000);
 
                 // Re-renderizar la tabla y gráficos
                 renderTopProductsTable(allProductsData, currentProductFilterCategory);
@@ -1734,7 +1739,7 @@ function deleteProduct(productId) {
 
     if (allProductsData.length < initialLength) {
         saveProductsToLocalStorage(); // Guardar los datos actualizados
-        displayMessageModal(`Producto eliminado exitosamente.`); // autoDismissDelay REMOVED
+        displayMessageModal(`Producto eliminado exitosamente.`, false, null, 2000);
         // Re-renderizar la tabla y el gráfico de productos para reflejar los cambios
         renderTopProductsTable(allProductsData, currentProductFilterCategory);
         populateProductCategoryFilter(); // Actualizar el filtro de categorías por si una categoría desapareció
@@ -1763,7 +1768,7 @@ function clearAllProductsData() {
         () => { // Callback si el usuario confirma
             allProductsData = []; // Vaciar el array de productos
             saveProductsToLocalStorage(); // Guardar el estado vacío
-            // Ya no mostramos un segundo modal de éxito, la confirmación es suficiente.
+            displayMessageModal(`Todos los productos han sido eliminados.`, false, null, 2000);
 
             // Re-renderizar todos los componentes afectados
             renderTopProductsTable(allProductsData, currentProductFilterCategory);
@@ -1801,8 +1806,7 @@ function deleteCurrentPageProducts() {
 
             if (allProductsData.length < initialLength) {
                 saveProductsToLocalStorage(); // Guardar los datos actualizados
-                // Ya no mostramos un segundo modal de éxito aquí.
-                // displayMessageModal(`Productos de la página actual eliminados exitosamente.`); // Eliminado para evitar el doble modal
+                displayMessageModal(`Productos de la página actual eliminados exitosamente.`, false, null, 2000);
                 // Re-renderizar la tabla y gráficos
                 renderTopProductsTable(allProductsData, currentProductFilterCategory);
                 populateProductCategoryFilter();
@@ -1843,7 +1847,7 @@ function toggleKpiAutoRefresh() {
             renderMonthlySalesChart(generateMonthlySalesData());
         }, KPI_REFRESH_RATE);
     }
-    displayMessageModal(`Auto-actualización de KPIs: ${kpiAutoRefreshEnabled ? 'Activada' : 'Desactivada'}`); // autoDismissDelay REMOVED
+    displayMessageModal(`Auto-actualización de KPIs: ${kpiAutoRefreshEnabled ? 'Activada' : 'Desactivada'}`, false, null, 2000);
 }
 
 
@@ -2191,7 +2195,7 @@ function initDashboard() {
 
             // Limpiar el formulario
             addProductForm.reset();
-            displayMessageModal(`Producto "${name}" añadido exitosamente!`); // autoDismissDelay REMOVED
+            displayMessageModal(`Producto "${name}" añadido exitosamente!`, false, null, 2000);
         });
     } else {
         console.warn("Formulario 'add-product-form' o elementos de categoría no encontrados.");
@@ -2225,25 +2229,31 @@ function initDashboard() {
 // Llama a la función de inicialización cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', () => {
     const storedData = localStorage.getItem('allProductsData');
-    if (storedData === null || JSON.parse(storedData).length === 0) { // Solo generar si no hay nada almacenado (primer inicio o borrado total)
-        console.log("No se encontraron productos en localStorage o está vacío, generando datos simulados.");
+    if (storedData === null) { // Solo generar si no hay nada almacenado (primer inicio)
+        console.log("No se encontraron productos en localStorage, generando datos simulados.");
         allProductsData = generateTopProductsData();
         saveProductsToLocalStorage();
     } else {
         // Los datos existen, cargarlos.
         try {
             allProductsData = JSON.parse(storedData);
-            // Asegura que todos los productos tengan la propiedad costPerUnit para compatibilidad
-            allProductsData = allProductsData.map(product => {
-                if (product.costPerUnit === undefined || product.costPerUnit === 0) {
-                    const simulatedCost = product.quantitySold > 0
-                        ? getRandomNumber(product.revenueGenerated / product.quantitySold * 0.4, product.revenueGenerated / product.quantitySold * 0.8, 2)
-                        : getRandomNumber(1, 10, 2);
-                    return { ...product, costPerUnit: simulatedCost };
-                }
-                return product;
-            });
-            console.log("Productos cargados desde localStorage.");
+            // Si allProductsData es un array vacío, significa que fue borrado intencionalmente.
+            // No es necesario regenerar datos en este caso.
+            if (allProductsData.length === 0) {
+                console.log("Productos cargados desde localStorage (tabla vacía).");
+            } else {
+                // Asegura que todos los productos tengan la propiedad costPerUnit para compatibilidad
+                allProductsData = allProductsData.map(product => {
+                    if (product.costPerUnit === undefined || product.costPerUnit === 0) {
+                        const simulatedCost = product.quantitySold > 0
+                            ? getRandomNumber(product.revenueGenerated / product.quantitySold * 0.4, product.revenueGenerated / product.quantitySold * 0.8, 2)
+                            : getRandomNumber(1, 10, 2);
+                        return { ...product, costPerUnit: simulatedCost };
+                    }
+                    return product;
+                });
+                console.log("Productos cargados desde localStorage.");
+            }
         } catch (e) {
             console.error("Error al cargar productos desde localStorage:", e);
             displayMessageModal("Advertencia: No se pudieron cargar los productos guardados. Se usarán datos nuevos.");
