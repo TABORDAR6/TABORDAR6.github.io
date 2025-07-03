@@ -1,0 +1,391 @@
+/* style.css */
+
+/* Variables CSS para colores - Tema Claro por defecto */
+:root {
+    --color-bg-body: #f3f4f6; /* bg-gray-100 */
+    --color-bg-container: #ffffff; /* bg-white */
+    --color-text-primary: #1f2937; /* text-gray-900 */
+    --color-text-secondary: #4b5563; /* text-gray-600 */
+    --color-text-tertiary: #6b7280; /* text-gray-500 */
+    --color-text-label: #374151; /* text-gray-700 */
+    --color-bg-card: #ffffff; /* bg-white */
+    --color-bg-chart-container: #e5e7eb; /* bg-gray-200 */
+    --color-bg-table-header: #f3f4f6; /* bg-gray-100 */
+    --color-bg-table-row-even: #f9fafb; /* bg-gray-50 */
+    --color-bg-table-row-hover: #e5e7eb; /* bg-gray-100 */
+    --color-border-default: #d1d5db; /* border-gray-300 */
+    --color-filter-select-bg: #e5e7eb; /* bg-gray-200 */
+    --color-filter-select-border: #d1d5db; /* border-gray-300 */
+    --color-filter-select-icon: #4b5563; /* text-gray-600 */
+    --color-sidebar-link: #cbd5e0; /* text-gray-300 */
+    --color-sidebar-link-hover-bg: #4a5568; /* gray-700 */
+    --color-sidebar-link-hover-text: #e2e8f0; /* text-gray-200 */
+    --color-sidebar-link-active-bg: #2b6cb0; /* blue-700 */
+    --color-sidebar-link-active-text: #ffffff; /* text-white */
+    --color-chart-font: #4a5568; /* text-gray-700 */
+    --color-chart-grid: rgba(0, 0, 0, 0.1);
+    --color-chart-border: rgba(0, 0, 0, 0.2);
+    --color-chart-line: rgb(75, 192, 192);
+    --color-chart-bar: rgba(153, 102, 255, 0.6);
+    --color-chart-doughnut-1: #FF6384;
+    --color-chart-doughnut-2: #36A2EB;
+    --color-chart-doughnut-3: #FFCE56;
+    --color-chart-doughnut-4: #4BC0C0;
+    --color-chart-doughnut-5: #9966FF;
+    --color-breadcrumb-active: #2d3748; /* text-gray-800 */
+    --color-breadcrumb-separator: #a0aec0; /* text-gray-400 */
+}
+
+/* Variables CSS para colores - Tema Oscuro */
+body.dark-theme {
+    --color-bg-body: #1a202c; /* bg-gray-900 */
+    --color-bg-container: #2d3748; /* bg-gray-800 */
+    --color-text-primary: #e2e8f0; /* text-gray-200 */
+    --color-text-secondary: #a0aec0; /* text-gray-400 */
+    --color-text-tertiary: #a0aec0; /* text-gray-400 */
+    --color-text-label: #cbd5e0; /* text-gray-300 */
+    --color-bg-card: #4a5568; /* gray-700 */
+    --color-bg-chart-container: #4a5568; /* gray-700 */
+    --color-bg-table-header: #4a5568; /* gray-700 */
+    --color-bg-table-row-even: #2d3748; /* bg-gray-800 */
+    --color-bg-table-row-hover: #4a5568; /* gray-700 */
+    --color-border-default: #4a5568; /* gray-700 */
+    --color-filter-select-bg: #4a5568; /* gray-700 */
+    --color-filter-select-border: #616e7f; /* gray-600 */
+    --color-filter-select-icon: #e2e8f0; /* text-gray-200 */
+    --color-chart-font: #e2e8f0; /* text-gray-200 */
+    --color-chart-grid: rgba(255, 255, 255, 0.1);
+    --color-chart-border: rgba(255, 255, 255, 0.2);
+    --color-chart-line: rgb(130, 201, 169); /* Un verde más claro */
+    --color-chart-bar: rgba(173, 130, 255, 0.6); /* Un morado más claro */
+    --color-chart-doughnut-1: #FF80A0;
+    --color-chart-doughnut-2: #63B2F0;
+    --color-chart-doughnut-3: #FFE080;
+    --color-chart-doughnut-4: #7ED6D6;
+    --color-chart-doughnut-5: #B080FF;
+    --color-breadcrumb-active: #e2e8f0; /* text-gray-200 */
+}
+
+/* Estilos Generales */
+body {
+    background-color: var(--color-bg-body);
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dashboard-container {
+    background-color: var(--color-bg-container);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Estilos para el sidebar */
+.sidebar {
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    color: var(--color-sidebar-link);
+}
+
+.sidebar-link:hover {
+    background-color: var(--color-sidebar-link-hover-bg);
+    color: var(--color-sidebar-link-hover-text);
+}
+
+.sidebar-link.active {
+    background-color: var(--color-sidebar-link-active-bg);
+    color: var(--color-sidebar-link-active-text);
+    font-weight: bold;
+}
+
+.sidebar-link.active svg {
+    color: var(--color-sidebar-link-active-text);
+}
+
+/* Estilos para el encabezado */
+.header-title {
+    font-size: 2.25rem; /* text-4xl */
+    font-weight: 700; /* font-bold */
+    color: var(--color-text-primary);
+    transition: color 0.3s ease;
+}
+
+.date-filter-select {
+    appearance: none; /* Elimina el estilo predeterminado del navegador */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: var(--color-filter-select-bg);
+    border: 1px solid var(--color-filter-select-border);
+    border-radius: 0.375rem; /* rounded-md */
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--color-text-label);
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Actualiza la imagen SVG del select para que cambie de color con el tema */
+.date-filter-select {
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%234A5568%22%3E%3Cpath%20d%3D%22M9.293%2012.95l.707.707L15%209.707V15a1%201%200%2001-1%201H5a1%201%200%2001-1-1V5a1%201%200%20011-1h5.293l-4.293%204.293.707.707L10%2012.293z%22%2F%3E%3C%2Fsvg%3E');
+}
+body.dark-theme .date-filter-select {
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%23e2e8f0%22%3E%3Cpath%20d%3D%22M9.293%2012.95l.707.707L15%209.707V15a1%201%200%2001-1%201H5a1%201%200%2001-1-1V5a1%201%200%20011-1h5.293l-4.293%204.293.707.707L10%2012.293z%22%2F%3E%3C%2Fsvg%3E');
+}
+
+
+.select-icon {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--color-filter-select-icon);
+    transition: color 0.3s ease;
+}
+
+
+.refresh-button {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #4299e1; /* blue-500 */
+    color: white;
+    border-radius: 0.375rem; /* rounded-md */
+    font-weight: 600; /* font-semibold */
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.refresh-button:hover {
+    background-color: #3182ce; /* blue-600 */
+}
+
+/* Estilos de las tarjetas KPI */
+.kpi-card {
+    background-color: var(--color-bg-card);
+    padding: 1.5rem;
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-md */
+    text-align: center;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kpi-label {
+    font-size: 0.875rem; /* text-sm */
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.kpi-value {
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: 700; /* font-bold */
+    color: var(--color-text-primary);
+    transition: color 0.3s ease;
+}
+
+.kpi-variation {
+    font-size: 0.875rem; /* text-sm */
+    margin-top: 0.5rem;
+}
+
+.text-green-variation {
+    color: #38a169; /* green-600 */
+}
+
+.text-red-variation {
+    color: #e53e3e; /* red-600 */
+}
+
+/* Estilos de la tabla */
+.table-header-cell {
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 700; /* font-bold */
+    color: var(--color-text-label);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.table-body-cell {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--color-text-tertiary);
+    transition: color 0.3s ease;
+}
+
+.table-row:nth-child(even) {
+    background-color: var(--color-bg-table-row-even);
+    transition: background-color 0.3s ease;
+}
+
+.table-row:hover {
+    background-color: var(--color-bg-table-row-hover);
+    transition: background-color 0.3s ease;
+}
+
+/* Clases para el mapa de calor de ventas */
+.bg-sales-very-high { background-color: #4CAF50; color: white; } /* Verde oscuro */
+.bg-sales-high { background-color: #8BC34A; } /* Verde medio */
+.bg-sales-medium-high { background-color: #CDDC39; } /* Verde claro */
+.bg-sales-medium { background-color: #FFEB3B; } /* Amarillo */
+.bg-sales-medium-low { background-color: #FFC107; } /* Naranja */
+.bg-sales-low { background-color: #FF9800; } /* Naranja oscuro */
+
+
+/* Clases para el mapa de calor de pedidos */
+.bg-orders-very-high { background-color: #007bff; color: white; } /* Azul oscuro */
+.bg-orders-high { background-color: #3399ff; } /* Azul medio */
+.bg-orders-medium-high { background-color: #66b2ff; } /* Azul claro */
+.bg-orders-medium { background-color: #99ccff; } /* Azul muy claro */
+.bg-orders-medium-low { background-color: #cce5ff; } /* Azul pastel */
+.bg-orders-low { background-color: #e6f2ff; } /* Azul casi blanco */
+
+
+/* **NUEVOS ESTILOS/MODIFICACIONES PARA CONTENEDORES DE GRÁFICOS** */
+
+/* Estilo base para todos los contenedores de gráficos */
+.chart-container {
+    position: relative;
+    padding-bottom: 2rem;
+    height: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-bg-chart-container);
+    transition: background-color 0.3s ease;
+}
+
+/* Estilo específico para el canvas dentro de un contenedor de gráfico */
+.chart-container canvas {
+    max-height: 100%;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Ajuste específico para el contenedor de la dona que ya tenía 800px */
+#regions-content .chart-container {
+    height: 800px;
+}
+
+/* Ajuste para el gráfico de detalle de departamento, que es más pequeño */
+#department-sales-chart-container {
+    height: 250px;
+}
+
+/* Ajuste para el modal del producto, que también es más pequeño */
+#modal-product-sales-chart-container {
+    height: 250px;
+}
+
+
+/* **NUEVOS ESTILOS PARA ORDENAMIENTO DE TABLAS** */
+.sort-arrow {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid var(--color-border-default);
+    opacity: 0.6;
+    transition: border-bottom-color 0.3s ease;
+}
+
+.sort-arrow.asc {
+    border-bottom: 4px solid #2b6cb0; /* Azul */
+    transform: rotate(0deg);
+    opacity: 1;
+}
+
+.sort-arrow.desc {
+    border-top: 4px solid #2b6cb0; /* Azul */
+    border-bottom: none;
+    transform: rotate(0deg);
+    opacity: 1;
+}
+
+/* **NUEVOS ESTILOS PARA SPINNER DE CARGA** */
+/* #loading-spinner styles are handled by Tailwind classes in the HTML */
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #ffffff; /* Color del spinner */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Breadcrumbs styles */
+.breadcrumb-item + .breadcrumb-item::before {
+    content: '/';
+    margin: 0 0.5rem;
+    color: var(--color-breadcrumb-separator);
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a {
+    color: #4299e1; /* blue-500 */
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active-breadcrumb {
+    color: var(--color-breadcrumb-active);
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+/* Estilos para los campos de formulario */
+.block.w-full.border {
+    border-color: var(--color-border-default);
+    background-color: var(--color-bg-container); /* Para que el fondo del input cambie con el tema */
+    color: var(--color-text-primary);
+    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilos para los modales (detalles y edición) */
+#product-detail-modal .bg-white,
+#edit-product-modal .bg-white {
+    background-color: var(--color-bg-container);
+    transition: background-color 0.3s ease;
+}
+
+#product-detail-modal h2,
+#edit-product-modal h2 {
+    color: var(--color-text-primary);
+    transition: color 0.3s ease;
+}
+
+#product-detail-modal p,
+#edit-product-modal label {
+    color: var(--color-text-label);
+    transition: color 0.3s ease;
+}
+
+#product-detail-modal p.font-semibold,
+#edit-product-modal input {
+    color: var(--color-text-primary);
+    transition: color 0.3s ease;
+}

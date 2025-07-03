@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Ventas y Rendimiento Comercial</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="flex min-h-screen bg-gray-100 text-gray-900">
+    <aside class="sidebar bg-gray-800 text-white w-64 p-4 space-y-4 flex-shrink-0">
+        <div class="text-2xl font-bold mb-6 text-center">Mi Dashboard</div>
+        <nav>
+            <ul>
+                <li>
+                    <a href="#dashboard" class="sidebar-link active" data-page="dashboard">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#productos" class="sidebar-link" data-page="products">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        Productos
+                    </a>
+                </li>
+                <li>
+                    <a href="#regiones" class="sidebar-link" data-page="regions">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Regiones
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="flex-1 p-4 overflow-y-auto">
+        <div class="container mx-auto bg-white shadow-lg rounded-lg p-6 dashboard-container">
+            <header class="mb-8 flex flex-col md:flex-row justify-between items-center">
+                <h1 class="header-title">Dashboard de Ventas</h1>
+                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                    <button id="reload-data-btn" class="refresh-button">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356-2A8.001 8.001 0 004 12c0 2.972 1.153 5.722 3.09 7.707l1.018-1.018M16 16v5h.582m-15.356-2A8.001 8.001 0 0120 12c0-2.972-1.153-5.722-3.09-7.707l-1.018 1.018"></path></svg>
+                        Recargar Datos
+                    </button>
+                    <button id="theme-toggle-btn" class="refresh-button">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                        Cambiar Tema
+                    </button>
+                    <!-- NUEVO: Botón para alternar auto-actualización de KPIs -->
+                    <button id="toggle-kpi-refresh-btn" class="refresh-button">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356-2A8.001 8.001 0 004 12c0 2.972 1.153 5.722 3.09 7.707l1.018-1.018M16 16v5h.582m-15.356-2A8.001 8.001 0 0120 12c0-2.972-1.153-5.722-3.09-7.707l-1.018 1.018"></path></svg>
+                        <span id="kpi-refresh-status">Auto-actualizar: ON</span>
+                    </button>
+                    <span id="current-date" class="text-gray-600 text-lg"></span>
+                    <div class="relative">
+                        <select id="date-range-filter" class="date-filter-select">
+                            <option value="last7days">Últimos 7 días</option>
+                            <option value="thisMonth" selected>Este Mes</option>
+                            <option value="last3Months">Últimos 3 Meses</option>
+                            <option value="thisYear">Este Año</option>
+                        </select>
+                        <div class="select-icon">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15 9.707V15a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1h5.293l-4.293 4.293.707.707L10 12.293z"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <nav class="text-sm font-semibold text-gray-500 mb-6" aria-label="Breadcrumb">
+                <ol id="breadcrumbs" class="list-none p-0 inline-flex">
+                    </ol>
+            </nav>
+
+            <div id="loading-spinner" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 hidden">
+                <div class="spinner"></div>
+            </div>
+
+            <section id="dashboard-content" class="page-content active">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="kpi-cards-container">
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-gray-200 p-10 rounded-lg shadow chart-container">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Ventas Mensuales (Tendencia)</h2>
+                        <canvas id="monthly-sales-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="products-content" class="page-content hidden">
+                <h2 class="text-2xl font-bold text-gray-500 mb-6">Análisis Detallado de Productos</h2>
+
+                <!-- Formulario para Añadir Nuevo Producto -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Añadir Nuevo Producto</h2>
+                    <form id="add-product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="product-name" class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
+                            <input type="text" id="product-name" name="name" required
+                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="product-quantity-sold" class="block text-sm font-medium text-gray-700">Cantidad Vendida</label>
+                            <input type="number" id="product-quantity-sold" name="quantitySold" required min="0"
+                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="product-revenue-generated" class="block text-sm font-medium text-gray-700">Ingresos Generados</label>
+                            <input type="number" id="product-revenue-generated" name="revenueGenerated" required min="0" step="0.01"
+                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="product-cost-per-unit" class="block text-sm font-medium text-gray-700">Costo por Unidad</label>
+                            <input type="number" id="product-cost-per-unit" name="costPerUnit" required min="0" step="0.01"
+                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="product-category" class="block text-sm font-medium text-gray-700">Categoría</label>
+                            <select id="product-category" name="category" required
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div id="new-category-input-container" class="hidden">
+                            <label for="new-product-category" class="block text-sm font-medium text-gray-700">Nueva Categoría</label>
+                            <input type="text" id="new-product-category" name="newCategory"
+                                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Introduce una nueva categoría">
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="submit" id="add-product-btn"
+                                    class="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Añadir Producto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Fin del Formulario para Añadir Nuevo Producto -->
+
+                <div class="flex items-center space-x-4 mb-6">
+                    <label for="product-category-filter" class="text-gray-700 font-medium">Filtrar por Categoría:</label>
+                    <div class="relative">
+                        <select id="product-category-filter" class="date-filter-select">
+                            <option value="all">Todas</option>
+                        </select>
+                        <div class="select-icon">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15 9.707V15a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1h5.293l-4.293 4.293.707.707L10 12.293z"/></svg>
+                        </div>
+                    </div>
+                    <!-- NUEVO: Campo de búsqueda de productos -->
+                    <div class="relative flex-grow">
+                        <input type="text" id="product-search-input" placeholder="Buscar producto por nombre..."
+                               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 pl-10 focus:ring-blue-500 focus:border-blue-500">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-gray-200 p-10 rounded-lg shadow chart-container">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Ventas por Producto</h2>
+                        <canvas id="product-sales-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow mb-8">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Productos Más Vendidos (Tabla)</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th scope="col" class="table-header-cell cursor-pointer" data-sort-by="name">Producto <span class="sort-arrow" data-sort-arrow="name"></span></th>
+                                    <th scope="col" class="table-header-cell cursor-pointer" data-sort-by="quantitySold">Cantidad Vendida <span class="sort-arrow" data-sort-arrow="quantitySold"></span></th>
+                                    <th scope="col" class="table-header-cell cursor-pointer" data-sort-by="revenueGenerated">Ingresos Generados <span class="sort-arrow" data-sort-arrow="revenueGenerated"></span></th>
+                                    <th scope="col" class="table-header-cell cursor-pointer" data-sort-by="costPerUnit">Costo por Unidad <span class="sort-arrow" data-sort-arrow="costPerUnit"></span></th>
+                                    <th scope="col" class="table-header-cell cursor-pointer" data-sort-by="category">Categoría <span class="sort-arrow" data-sort-arrow="category"></span></th>
+                                    <th scope="col" class="table-header-cell">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="top-products-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-between items-center mt-4 space-x-2">
+                        <button id="prev-page-btn" class="refresh-button" disabled>Anterior</button>
+                        <span id="page-info" class="text-gray-600 text-sm">Página 1 de 1</span>
+                        <button id="next-page-btn" class="refresh-button">Siguiente</button>
+                        <!-- Botón y input de archivo para Importar CSV -->
+                        <label for="csv-file-input" class="refresh-button cursor-pointer">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Importar CSV
+                        </label>
+                        <input type="file" id="csv-file-input" accept=".csv" class="hidden"/>
+                        <!-- Botón de Exportar CSV con estilo consistente -->
+                        <button id="export-products-xml-btn" class="refresh-button">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Exportar CSV
+                        </button>
+                        <!-- Botón para Eliminar Todos los Productos -->
+                        <button id="clear-products-btn" class="refresh-button bg-red-500 hover:bg-red-600 text-white">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Borrar Tabla
+                        </button>
+                        <!-- NUEVO: Botón para Eliminar Productos de la Página Actual -->
+                        <button id="delete-current-page-products-btn" class="refresh-button bg-orange-500 hover:bg-orange-600 text-white">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Borrar Página Actual
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="regions-content" class="page-content hidden">
+                <h2 class="text-2xl font-bold text-gray-500 mb-6">Distribución Geográfica de Ventas</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow chart-container relative flex items-center justify-center" style="height: 800px;">
+                        <h2 class="text-xl font-semibold text-gray-700 absolute top-6 left-6">Ventas por Región</h2>
+                        <canvas id="region-distribution-chart" class="mx-auto my-auto" style="max-height: 600px; max-width: 600px;"></canvas>
+                        <p class="text-sm text-gray-500 mt-2 absolute bottom-6">Haz clic en un segmento para ver el detalle por departamento/ciudad.</p>
+                    </div>
+                    <!-- NUEVO: Contenedor para el Gráfico de Ticket Promedio por Región -->
+                    <div id="average-ticket-by-region-chart-container" class="bg-gray-200 p-10 rounded-lg shadow chart-container">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Ticket Promedio por Región</h2>
+                        <canvas id="average-ticket-by-region-chart"></canvas>
+                    </div>
+                    <div id="region-detail-container" class="bg-gray-50 p-6 rounded-lg shadow hidden">
+                        <h3 id="region-detail-title" class="text-xl font-semibold text-gray-700 mb-4">Detalle de Ventas para [Región]</h3>
+
+                        <div class="overflow-x-auto mb-6">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th scope="col" class="table-header-cell">Departamento/Ciudad</th>
+                                        <th scope="col" class="table-header-cell">Ventas Generadas</th>
+                                        <th scope="col" class="table-header-cell">Número de Pedidos</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="department-sales-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4 class="text-lg font-semibold text-gray-600 mb-2">Visualización de Ventas por Departamento</h4>
+                        <div id="department-sales-chart-container" class="chart-container" style="height: 250px;">
+                            <canvas id="department-sales-chart"></canvas>
+                        </div>
+
+                        <button id="back-to-regions-btn" class="refresh-button mt-4 hidden">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            Volver a Regiones
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <div id="product-detail-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl p-6 relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <h2 id="modal-product-name" class="text-2xl font-bold text-gray-800 mb-4">Detalles del Producto: [Nombre del Producto]</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <p class="text-gray-600 text-sm">Cantidad Vendida:</p>
+                    <p id="modal-quantity-sold" class="text-lg font-semibold text-gray-900"></p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Ingresos Generados:</p>
+                    <p id="modal-revenue-generated" class="text-lg font-semibold text-gray-900"></p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Costo por Unidad:</p>
+                    <p id="modal-cost-per-unit" class="text-lg font-semibold text-gray-900"></p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Categoría:</p>
+                    <p id="modal-category" class="text-lg font-semibold text-gray-900"></p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm">Fecha de Lanzamiento (Simulada):</p>
+                    <p id="modal-launch-date" class="text-lg font-semibold text-gray-900"></p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-600 mb-4">Tendencia de Ventas (Últimos 6 Meses)</h3>
+            <div id="modal-product-sales-chart-container" class="chart-container" style="height: 250px;">
+                <canvas id="modal-product-sales-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nuevo Modal para Editar Producto -->
+    <div id="edit-product-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+            <button id="close-edit-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Editar Producto</h2>
+            <form id="edit-product-form" class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="edit-product-name" class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
+                    <input type="text" id="edit-product-name" name="name" required
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="edit-product-quantity-sold" class="block text-sm font-medium text-gray-700">Cantidad Vendida</label>
+                    <input type="number" id="edit-product-quantity-sold" name="quantitySold" required min="0"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="edit-product-revenue-generated" class="block text-sm font-medium text-gray-700">Ingresos Generados</label>
+                    <input type="number" id="edit-product-revenue-generated" name="revenueGenerated" required min="0" step="0.01"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="edit-product-cost-per-unit" class="block text-sm font-medium text-gray-700">Costo por Unidad</label>
+                    <input type="number" id="edit-product-cost-per-unit" name="costPerUnit" required min="0" step="0.01"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="edit-product-category" class="block text-sm font-medium text-gray-700">Categoría</label>
+                    <select id="edit-product-category" name="category" required
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div id="edit-new-category-input-container" class="hidden">
+                    <label for="edit-new-product-category" class="block text-sm font-medium text-gray-700">Nueva Categoría</label>
+                    <input type="text" id="edit-new-product-category" name="newCategory"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Introduce una nueva categoría">
+                </div>
+                <div class="col-span-1">
+                    <button type="button" id="save-edited-product-btn"
+                            class="mt-4 px-6 py-2 bg-green-600 text-white font-semibold rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Fin del Nuevo Modal para Editar Producto -->
+
+    <script src="script.js"></script>
+</body>
+</html>
